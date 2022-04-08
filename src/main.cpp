@@ -51,6 +51,7 @@ void commands(String command)
 {
   String cmd, arg0, arg1, arg2;
   splitCommands(command, &cmd, &arg0, &arg1, &arg2);
+  // m 100 100
 
   if (cmd == "m")
   {
