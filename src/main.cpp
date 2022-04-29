@@ -18,6 +18,7 @@
 // HARDWARE VARIABLES
 Zumo32U4Motors motors;
 Zumo32U4Buzzer buzzer;
+Zumo32U4ProximitySensors proxSensors;
 
 // SETUP BLUETOOTH SERIAL
 int rx_pin = 14; // defining software serial pins (RX and TX) for arduino uno
@@ -45,13 +46,13 @@ void cmd_m(String arg0, String arg1, String arg2)
 {
   int leftSpeed = arg0.toInt();
   int rightSpeed = arg1.toInt();
+  motors.setSpeeds(leftSpeed, rightSpeed);
 }
 
 void commands(String command)
 {
   String cmd, arg0, arg1, arg2;
   splitCommands(command, &cmd, &arg0, &arg1, &arg2);
-  // m 100 100
 
   if (cmd == "m")
   {
@@ -65,32 +66,41 @@ void setup()
   Serial.begin(9600); // set the data rate for the Hardware Serial port
   Serial.write("Hardware Serial is working !");
 
+  proxSensors.initThreeSensors();
+
   // START BLUETOOTH SERIAL
-  /*BluetoothSerial.begin(9600); // set the data rate for the SoftwareSerial port
-  BluetoothSerial.write("Software Serial and Bluetooth is working !");*/
+  BluetoothSerial.begin(9600); // set the data rate for the SoftwareSerial port
+  BluetoothSerial.write("Software Serial and Bluetooth is working !");
 }
 
+char cmds[40];
 String cmd = "";
 
 void loop()
 {
+  proxSensors.read();
+  int frontLeft = proxSensors.countsFrontWithLeftLeds();
+  int frontRight = proxSensors.countsFrontWithRightLeds();
+  int sideLeft = proxSensors.countsLeftWithLeftLeds();
+  int sideRight = proxSensors.countsRightWithRightLeds();
 
   // BLUETOOTH SIGNAL IS COMING IN
-  /*if (BluetoothSerial.available())
+  if (BluetoothSerial.available() && cmd == "")
   {
     // READ CHARS AND WRITE TO COMMAND STRING
-    char c = BluetoothSerial.read();
-    cmd = cmd + c;
-    delay(1);
+    BluetoothSerial.readBytesUntil(';', cmds, 40);
+    Serial.println(cmds);
+    cmd = String(cmds);
   }
   else
   {
+    BluetoothSerial.flush();
     // IF COMMAND IS FINISHED SENDING, PRINT COMMAND AND EXECUTE OVER COMMAND HANDLER
     if (cmd != "")
     {
-      Serial.println(cmd);
       commands(cmd);
       cmd = "";
+      delay(100);
     }
   }
 
@@ -98,5 +108,23 @@ void loop()
   if (Serial.available())
   {
     BluetoothSerial.write(Serial.read());
-  }*/
+  }
+
+  if (frontLeft > 5 || frontRight > 5)
+  {
+    motors.setSpeeds(-50, -50);
+    delay(500);
+    motors.setSpeeds(0, 0);
+  }
+
+  String sd = "sd ";
+  sd.concat(frontLeft);
+  sd.concat(" ");
+  sd.concat(frontRight);
+  sd.concat(" ");
+  sd.concat(sideLeft);
+  sd.concat(" ");
+  sd.concat(sideRight);
+  BluetoothSerial.println(sd);
+  delay(50);
 }
