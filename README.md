@@ -28,6 +28,9 @@ Da wir mehr Funktionen des Zumos nutzen wollen, nutzen wir nur die Pins des Disp
 Alle weiteren Verbindungen gehen aus der Schematik hervor.
 
 ## Installation
+Die Ordnerstruktur dieses Projektes wurde durch PlatformIO in VS Code generiert. Diese Struktur ist jedoch nur relevant, wenn man Arduino Code über VS Code bearbeiten und hochladen möchte.
+ [Hier ein Überblick dazu](https://devdrik.de/arduino-in-vs-code/)
+ Für die Arduino IDE reicht jedoch lediglich die *zumo.ino* Datei im [Arduino Ordner](/arduino)
 
 ## Codeübersicht
 
