@@ -1,5 +1,9 @@
 # Zumo 32U4 Bluetooth
 
+
+
+
+
 Dieses Projekt integriert die Steuerung über Bluetooth. Der Code in diesem Projekt steht in direkter Verbindung zu einer dafür erstellten **Unity App** ([*Zumo-Bluetooth-App*](https://github.com/dermrvn-code/zumo-bluetooth-app)).<br><br>
 Da der Pololu 32U4 ohne Bluetooth Antenne kommt, muss diese seperat angebaut werden. Details dazu gibt es unter [Aufbau und Verkabelung](#aufbau-und-verkabelung).<br>
 Die App integriert die Möglichkeit die Motoren zu steuern und die Sensordaten des Zumos auszulesen.
@@ -13,7 +17,8 @@ Natürlich kann dieser Code beliebig um weitere Funktionen erweitert werden.
 <br>
 ## Aufbau und Verkabelung
 <br>
-![Verkabelung](https://raw.githubusercontent.com/dermrvn-code/zumo-bluetooth/master/circuit.png)<br><sub>*Verschaltung von Zumo, Levelshifter, und Bluetoothmodul*</sub>
+![Verkabelung](https://raw.githubusercontent.com/dermrvn-code/zumo-bluetooth/master/circuit.png)
+<br><sub>*Verschaltung von Zumo, Levelshifter, und Bluetoothmodul*</sub>
 <br><br>
 Der Code definiert die Pins 13 und 14 als RX bzw. TX Pins. Diese Pins sind zu erreichen, wenn man das Display des Zumos absteckt.
 <br>
