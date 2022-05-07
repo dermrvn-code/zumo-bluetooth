@@ -37,8 +37,7 @@ Die Ordnerstruktur dieses Projektes wurde durch PlatformIO in VS Code generiert.
 
 ## Codeübersicht
 Im Folgenden gebe ich eine grobe Übersicht über den Code und seine allgemeine Funktionsweise. Ich werde nicht jedes Statement erklären, sondern nur die Wichtigsten Blöcke im Überblick.
-### Kopf
-<br>
+### Kopf des Codes
 *Nur für die, die PIO nutzen:* Da wir in C++ schreiben und nicht in dem Arduino Format, werden zunächst die benötigten Bibliotheken eingebunden.
 <br>
 *Für alle:* Zum Start werden die Motoren und die Sensoren in Variablen definiert. Ebenfalls definieren wir die Pins für RX und TX und Erstellen mit diesen Pins ein SoftwareSerial welches wir für die Bluetooth Kommunikation verwenden werden.
@@ -57,9 +56,45 @@ Zu Beginn des Loops lesen wir alle vier Sensoren aus und speichern diese.
 <br>
 Danach kümmern wir uns um einkommende Bluetooth Signale. Solange wir über Bluetooth Zeichen verfügbar haben und keinen fertigen Befehl gespeichert haben, werden alle Zeichen bis zum ; in unser char array eingelesen. Danach wird unser Befehl gespeichert und über den Else Block verarbeitet.
 <br>
-In diesem Block wird die [`commands()`](#commands()) Funktion aufgerufen, welche den Befehl filtert und die verbundene Aktion ausführt. Danach wird noch der Befehlsstring und das char array geleert.
+In diesem Block wird die [`commands()`](#commands) Funktion aufgerufen, welche den Befehl filtert und die verbundene Aktion ausführt. Danach wird noch der Befehlsstring und das char array geleert.
 <br>
+Bei ausgehenden Bluetooth Daten wird nur die [`readSensorData()`](#readsensordata) Funktion ausgeführt, auf welche ich in Kürze eingehen werde.
+<br>
+Der letzte Block der loop beeinhaltet einen "Sicherheitsblock". Dieser ist dafür zustänidg, dass der Zumo stoppt, wenn die Sensoren nach vorne eine Blockade erkennen. Erkennen sie dieses, geht der Zumo ein Stück zurück und stoppt.
 
+Nun gehe ich auf die vor der [`setup()`](#setup) definierten Funktionen ein.
+
+### splitCommands()
+`void  splitCommands(String  command, String  *cmd, String  *arg0, String  *arg1, String  *arg2)`
+Diese Funktion macht nichts anderes, als einen `String command` zu nehmen und diesen in vier Strings zu teilen. 
+<br>
+Dies macht diese Funktion, indem sie den Hauptstring an den Leerzeichen teilt. Der erste Teil wird dann über einen Pointer dem `String *cmd` übergeben. Der zweite, dritte und vierte Teil wird, ebenfalls über Pointer, den Strings der Argumente `arg0, arg1, arg2` übergeben.
+<br>
+Da C++ bzw. Arduino keine einfache split Methode zur Verfügung stellt, habe ich mich für diese Methode des Teilens entschieden.<br>
+<sub>*Verbesserungsvorschläge sind gerne gesehen*</sub>
+
+### commands()
+`void  commands(String  command)`
+Diese Funktion bearbeitet die Befehle, welche per Bluetooth hineinkommen und führt je nach Befehl die Aktion durch.
+<br>
+Dafür werden zunächst die vier Strings angelegt, die in die [`splitCommands()`](#splitcommands) Funktion gefüttert werden.
+<br>
+Einer dieser Strings (`cmd`) enhält den Befehl, welcher auszuführen ist. Dieser String wird dann in einer if-Abfrage überprüft. Da der Zumo bisher nur einen *move* Befehl annimmt (Keyword *m*), wird nur nach diesem gesucht. Danach wird zur Aussortierung von fehlerhaften Befehlen überprüft, ob der ursprüngliche Befehlsstring die richtige Länge hat und nicht zu wenig oder zu viele Zeichen gesendet hat.
+<br>
+Wenn dies erfüllt ist, werden die Argumente in Zahlen umgewandelt und die Werte werden zurück ins Negative umgewandelt.
+<br>
+Zur Vereinfachung schickt die App keine negativen werden. Der Wert 300 entspricht einer 0. Dementsprechend ist die 0 = -300 und die 600 = 300. Diese Umwandelung wird gemeinsam mit der Konvertierung zur Zahl durchgeführt.
+<br>
+Diese Integer werden nun einfach an den Motor des Zumos gesendet.
+
+### sendSensorData()
+`void  sendSensorData(int  frontLeft, int  frontRight, int  sideLeft, int  sideRight)`
+Diese Funktion sendet die als Parameter angegebenen SensorDaten über Bluetooth an die App.
+<br>
+Da die App die Sensordaten über das Keyword *sd*(sendData) empfängt, wird dieses an den Anfang gesetzt. Danach werden die Sensordaten angehängt, sodass der Befehl nach dem Schema `sd <frontLeft> <frontRight <sideLeft> <sideRight>` aufgebaut ist.
+<br>
+Dieser String wird nun einfach über den Bluetooth Serial gesendet.
 
 ## Code erweitern
-
+Im Folgenden werde ich erklären, wie der Code um mehr Funktionen erweitert werden kann.
+<br>
