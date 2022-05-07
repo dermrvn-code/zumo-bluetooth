@@ -46,12 +46,13 @@ void splitCommands(String command, String *cmd, String *arg0, String *arg1, Stri
 // SPLITS A COMMAND STRING AND RUNS THE CORRESPONDING ACTION
 void commands(String command)
 {
-  if (command.length() == 9)
-  {
-    String cmd, arg0, arg1, arg2;
-    splitCommands(command, &cmd, &arg0, &arg1, &arg2);
 
-    if (cmd == "m")
+  String cmd, arg0, arg1, arg2;
+  splitCommands(command, &cmd, &arg0, &arg1, &arg2);
+
+  if (cmd == "m")
+  {
+    if (command.length() == 9)
     {
       int leftSpeed = arg0.toInt() - 300;
       int rightSpeed = arg1.toInt() - 300;
