@@ -46,14 +46,18 @@ void splitCommands(String command, String *cmd, String *arg0, String *arg1, Stri
 // SPLITS A COMMAND STRING AND RUNS THE CORRESPONDING ACTION
 void commands(String command)
 {
-  String cmd, arg0, arg1, arg2;
-  splitCommands(command, &cmd, &arg0, &arg1, &arg2);
-
-  if (cmd == "m")
+  if (command.length() == 9)
   {
-    int leftSpeed = arg0.toInt();
-    int rightSpeed = arg1.toInt();
-    motors.setSpeeds(leftSpeed, rightSpeed);
+    String cmd, arg0, arg1, arg2;
+    splitCommands(command, &cmd, &arg0, &arg1, &arg2);
+
+    if (cmd == "m")
+    {
+      int leftSpeed = arg0.toInt() - 300;
+      int rightSpeed = arg1.toInt() - 300;
+
+      motors.setSpeeds(leftSpeed, rightSpeed);
+    }
   }
 }
 
@@ -87,7 +91,8 @@ void setup()
 }
 
 // GLOBAL COMMAND VARIABLES
-char cmd_chars[40];
+const int datalength = 25;
+char cmd_chars[datalength];
 String cmd = "";
 
 void loop()
@@ -108,9 +113,10 @@ void loop()
   if (BluetoothSerial.available() && cmd == "")
   {
     // READ CHARS AND WRITE TO COMMAND STRING
-    BluetoothSerial.readBytesUntil(';', cmd_chars, 40);
-    Serial.println(cmd_chars);
+    BluetoothSerial.readBytesUntil(';', cmd_chars, datalength);
     cmd = String(cmd_chars);
+    Serial.println(cmd);
+    BluetoothSerial.flush();
   }
   else
   {
@@ -120,6 +126,10 @@ void loop()
     {
       commands(cmd);
       cmd = "";
+      for (int i = 0; i < sizeof(cmd_chars); i++)
+      {
+        cmd_chars[i] = 0;
+      }
       delay(100);
     }
   }
@@ -129,16 +139,8 @@ void loop()
   //
   // ========== BLUETOOTH OUT ===========================================================
 
-  if (BluetoothSerial.availableForWrite())
-  {
-    // SEND SERIAL DATA TO BLUETOOTH (for debugging)
-    if (Serial.available())
-    {
-      BluetoothSerial.write(Serial.read());
-    }
+  // sendSensorData(frontLeft, frontRight, sideLeft, sideRight);
 
-    sendSensorData(frontLeft, frontRight, sideLeft, sideRight);
-  }
   // ====================================================================================
   //
   //
