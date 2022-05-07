@@ -11,16 +11,19 @@ Natürlich kann dieser Code beliebig um weitere Funktionen erweitert werden.
 2. [Installation](#installation)
 3. [Codeübersicht](#codeübersicht)
 4. [Code erweitern](#code-erweitern)
+5. [Schlusswort](#schlusswort)
   
 ## Aufbau und Verkabelung
-![Verkabelung](https://raw.githubusercontent.com/dermrvn-code/zumo-bluetooth/master/circuit.png)  
-<sub>*Verschaltung von Zumo, Levelshifter, und Bluetoothmodul*</sub>
+![Verkabelung](https://raw.githubusercontent.com/dermrvn-code/zumo-bluetooth/master/circuit.png)
+  <sub>*Verschaltung von Zumo, Levelshifter, und Bluetoothmodul*</sub>
   
+    
 Der Code definiert die Pins 13 und 14 als RX bzw. TX Pins. Diese Pins sind zu erreichen, wenn man das Display des Zumos absteckt.
 
-![Pinout des Zumos](https://a.pololu-files.com/picture/0J6286.1200.jpg?177f62fab7018b9ff5f2898d27f91d61)  
+![Pinout des Zumos](https://a.pololu-files.com/picture/0J6286.1200.jpg?177f62fab7018b9ff5f2898d27f91d61)
 <sub>*Das Pinout der Oberseite des Zumos*</sub>
   
+    
 Hier sieht man das Pinout des Zumos. Für dieses Projekt ist nur der obere Teil relevant, wo normalerweise das Display eingesteckt ist und die Pins 13 und 14 liegen.
   
 Da wir mehr Funktionen des Zumos nutzen wollen, nutzen wir nur die Pins des Displays. Da wir aber auch eine 3.3V Quelle benötigen, aber nur eine 5V Quelle bei unseren Pins vorhanden haben, müssen wir über zwei Widerstände die 3.3V selbst erzeugen.
@@ -104,3 +107,56 @@ Dieser String wird nun einfach über den Bluetooth Serial gesendet.
 ## Code erweitern
 Im Folgenden werde ich erklären, wie der Code um mehr Funktionen erweitert werden kann.
   
+Die aktuellen Befehle des Zumos sehen wie folgt aus:
+  
+**Eingehend**
+`m <leftSpeed> <rightSpeed>`
+Motordaten zwischen 0-600
+
+**Ausgehend**
+`sd <frontLeft> <frontRight> <sideLeft> <sideRight>`
+Sensordaten zwischen 0-6
+  
+Nun kann man sich natürlich weitere Befehle ausdenken.
+Als Beispiel für einen einkommenden Befehl könnte man nun den Buzzer des Zumos ansteuern.
+  
+Dafür fügt man nun zuerst den Buzzer im Kopf hinzu um in später kontrollieren zu können.
+  
+Als nächstes würde man sich einen Befehl ausdenken. 
+Nehmen wir nun einfach mal folgenden Aufbau:
+`b <note> <duration> <volume>`
+Diese Syntax orientiert sich an den drei Parametern, die die [`playNote()`](https://pololu.github.io/pololu-buzzer-arduino/class_pololu_buzzer.html#a989d410dd6cdb7abfa136c3734040fb5) Funktion des Buzzers nimmt.
+
+Dieser Befehl muss nun natürlich auch in der App integriert werden. Darauf gehe ich jedoch in der Dokumentation der [**Zumo-Bluetooth-App**](https://github.com/dermrvn-code/zumo-bluetooth-app) ein. Hier beschränken wir uns nun erstmal nur auf den Zumo Code.
+  
+Nun wäre der erste Schritt in die [`commands()`](#commands) Funktion zu gehen und eine weitere Abfrage nach dem `if (cmd  ==  "m")` zu machen.
+In unserem Falle wäre dies `else if(cmd == "b")`.
+   
+ Nun kann man je nach Einheitlichkeit des Befehls noch Abfragen, ob der Befehl der konventionellen Länge entspricht. Da ich aber hier nicht definieren werde, in welchem Format z.B. die Note in dem Befehl geschickt wird, gebe ich hier keinen Wert an. Diese Abfrage kann also weggelassen oder durch andere bessere Sicherungen ersetzt werden.
+   
+ Nun müssen unsere drei Befehlsargumente nur noch in die von [`playNote()`](https://pololu.github.io/pololu-buzzer-arduino/class_pololu_buzzer.html#a989d410dd6cdb7abfa136c3734040fb5) geforderten Parameter konvertiert und dann in die Funktion eingegeben werden.
+   
+ Da diese Konvertierung abhängig von dem gewählten Format der Note, der Dauer und der Lautstärke ist, gebe ich hierfür kein Beispiel.
+   
+ Zu beachten bei eingehenden Befehlen ist jedoch, dass man neben dem Befehlswort mit dem aktuellen Code nur drei Argumente zur Verfügung hat. Dies kann man natürlich erweitern, jedoch werde ich darauf hier nicht eingehen.
+  
+Nun kann man natürlich ähnlich auch ausgehende Befehle erstellen.
+Beim Zumo könnte man nun die Liniensensoren auslesen und sie an die App schicken.
+  
+Hierfür denkt man sich nun wieder einen Befehl aus.
+`sld <left> <middle> <right>`
+  
+Nach diesem Schema kann man sich nun einfach eine Funktion schreiben, die der [`sendSensorData`](#sendsensordata) Funktion ähnelt. Nur muss man hier den Befehl mit `sld` (*sendLineData*) starten und dann die Liniendaten anhängen. Dieses Kommando sendet man dann einfach in den Bluetooth Serial.
+  
+Diese Funktion wird dann einfach nach der [`sendSensorData`](#sendsensordata) Funktion aufgerufen und fertig ist die Ausgabe der Liniensensordaten.
+  
+Natürlich muss die App dann auch um die entsprechenden Funktionen erweitert werden. Darauf gehe ich aber, wie bereits erwähnt, in der Dokumentation der [**Zumo-Bluetooth-App**](https://github.com/dermrvn-code/zumo-bluetooth-app) ein.
+  
+Mit dieser Grundidee lässt sich dieser Code (und der der App) nun beliebig erweitern. Natürlich lässt sich dieser Code auch so weit umgestalten, dass nicht unbedingt ein Zumo, sondern irgendein Arduino darüber gesteuert werden kann.
+
+## Schlusswort
+Vorschläge und Verbesserungen sind gerne gesehen. Der Code ist nicht perfekt, aber tut was er soll. Wenn jemand Fehler entdeckt oder eine bessere Lösung für Dinge hat, bin ich offen dafür, diese in das Projekt zu integrieren.
+  
+Ich hoffe der Code kann gut genutzt werden oder zumindest als Inspiration für jemanden dienen.
+  
+Bei Fragen oder Ähnlichem: Meine Daten sind auf meinem Profil verlinkt.
