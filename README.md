@@ -12,6 +12,7 @@ Natürlich kann dieser Code beliebig um weitere Funktionen erweitert werden.
 5. [Code erweitern](#code-erweitern)
 <br>
 ## Aufbau und Verkabelung
+<br>
 ![Verkabelung](https://raw.githubusercontent.com/dermrvn-code/zumo-bluetooth/master/circuit.png)<br><sub>*Verschaltung von Zumo, Levelshifter, und Bluetoothmodul*</sub>
 <br><br>
 Der Code definiert die Pins 13 und 14 als RX bzw. TX Pins. Diese Pins sind zu erreichen, wenn man das Display des Zumos absteckt.
