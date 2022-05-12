@@ -127,7 +127,10 @@ void loop()
   //
   // ========== BLUETOOTH OUT ===========================================================
 
-  // sendSensorData(frontLeft, frontRight, sideLeft, sideRight);
+  if (BluetoothSerial.availableForWrite())
+  {
+    // sendSensorData(frontLeft, frontRight, sideLeft, sideRight);
+  }
 
   // ====================================================================================
   //
