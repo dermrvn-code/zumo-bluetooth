@@ -91,11 +91,6 @@ void setup()
   proxSensors.initThreeSensors();
 }
 
-// GLOBAL COMMAND VARIABLES
-const int datalength = 25;
-char cmd_chars[datalength];
-String cmd = "";
-
 void loop()
 {
   // ========== READ SENSORS ============================================================
@@ -110,30 +105,22 @@ void loop()
   //
   // ========== BLUETOOTH IN ============================================================
 
+  const int datalength = 25;
+  char btdata[datalength];
+  String cmd = "";
+
   // BLUETOOTH SIGNAL IS COMING IN
-  if (BluetoothSerial.available() && cmd == "")
+  if (BluetoothSerial.available() > 0)
   {
     // READ CHARS AND WRITE TO COMMAND STRING
-    BluetoothSerial.readBytesUntil(';', cmd_chars, datalength);
-    cmd = String(cmd_chars);
+    BluetoothSerial.readBytesUntil(';', btdata, datalength);
+    cmd = String(btdata);
     Serial.println(cmd);
+    commands(cmd);
     BluetoothSerial.flush();
+    delay(100);
   }
-  else
-  {
-    BluetoothSerial.flush();
-    // IF COMMAND IS FINISHED SENDING, PRINT COMMAND AND EXECUTE OVER COMMAND HANDLER
-    if (cmd != "")
-    {
-      commands(cmd);
-      cmd = "";
-      for (int i = 0; i < sizeof(cmd_chars); i++)
-      {
-        cmd_chars[i] = 0;
-      }
-      delay(100);
-    }
-  }
+
   // ====================================================================================
   //
   //
