@@ -70,6 +70,7 @@ void sendSensorData(int frontLeft, int frontRight, int sideLeft, int sideRight)
   sd += String(frontRight) + " ";
   sd += String(sideLeft) + " ";
   sd += String(sideRight);
+  BluetoothSerial.flush();
   BluetoothSerial.println(sd);
 }
 
@@ -91,8 +92,13 @@ void setup()
   proxSensors.initThreeSensors();
 }
 
+unsigned long previousMillis = 0; // will store last time LED was updated
+const long interval = 1000;
+
 void loop()
 {
+  unsigned long currentMillis = millis();
+
   // ========== READ SENSORS ============================================================
   proxSensors.read();
   int frontLeft = proxSensors.countsFrontWithLeftLeds();
@@ -105,19 +111,19 @@ void loop()
   //
   // ========== BLUETOOTH IN ============================================================
 
-  const int datalength = 25;
-  char btdata[datalength];
+  const int datalength = 15;
+  char btdata[datalength] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   String cmd = "";
 
   // BLUETOOTH SIGNAL IS COMING IN
   if (BluetoothSerial.available() > 0)
   {
     // READ CHARS AND WRITE TO COMMAND STRING
+    BluetoothSerial.flush();
     BluetoothSerial.readBytesUntil(';', btdata, datalength);
     cmd = String(btdata);
     Serial.println(cmd);
     commands(cmd);
-    BluetoothSerial.flush();
     delay(100);
   }
 
@@ -127,9 +133,11 @@ void loop()
   //
   // ========== BLUETOOTH OUT ===========================================================
 
-  if (BluetoothSerial.availableForWrite())
+  if (currentMillis - previousMillis >= interval)
   {
-    // sendSensorData(frontLeft, frontRight, sideLeft, sideRight);
+    previousMillis = currentMillis;
+    sendSensorData(frontLeft, frontRight, sideLeft, sideRight);
+    delay(100);
   }
 
   // ====================================================================================
@@ -142,10 +150,8 @@ void loop()
   // STOP AND BACKUP IF SOMETHING IN FRONT
   if (frontLeft > 5 || frontRight > 5)
   {
-    motors.setSpeeds(-50, -50);
-    delay(500);
+    motors.setSpeeds(-100, -100);
+    delay(200);
     motors.setSpeeds(0, 0);
   }
-
-  delay(50);
 }
