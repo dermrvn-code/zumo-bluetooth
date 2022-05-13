@@ -18,7 +18,7 @@ Natürlich kann dieser Code beliebig um weitere Funktionen erweitert werden.
   <sub>*Verschaltung von Zumo, Levelshifter, und Bluetoothmodul*</sub>
   
     
-Der Code definiert die Pins 13 und 14 als RX bzw. TX Pins. Diese Pins sind zu erreichen, wenn man das Display des Zumos absteckt.
+Der Code definiert die Pins 13 und 14 als TX bzw. RX Pins. Diese Pins sind zu erreichen, wenn man das Display des Zumos absteckt.
 
 ![Pinout des Zumos](https://a.pololu-files.com/picture/0J6286.1200.jpg?177f62fab7018b9ff5f2898d27f91d61)
 <sub>*Das Pinout der Oberseite des Zumos*</sub>
