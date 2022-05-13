@@ -15,6 +15,8 @@
 #include <SoftwareSerial.h>
 #include <Zumo32U4.h>
 
+const char Starwars[] PROGMEM =
+    "! O3 L4 ggge-8.b16 ge-8.b16g2";
 // HARDWARE VARIABLES
 Zumo32U4Motors motors;
 Zumo32U4Buzzer buzzer;
@@ -58,6 +60,14 @@ void commands(String command)
       int rightSpeed = arg1.toInt() - 300;
 
       motors.setSpeeds(leftSpeed, rightSpeed);
+    }
+  }
+  else if (cmd == "h")
+  {
+    if (command.length() == 1)
+    {
+      buzzer.stopPlaying();
+      buzzer.playFromProgramSpace(Starwars);
     }
   }
 }
