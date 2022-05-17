@@ -1,11 +1,21 @@
+/*
+   == Zumo Robot ==
+  [ by Leona, Jakob und Marvin ]
+*/
+#include <Arduino.h>
+#include <SoftwareSerial.h>
+#include <Zumo32U4.h>
+
+const char Starwars[] PROGMEM =
+    "! O3 L4 ggge-8.b16 ge-8.b16g2";
 // HARDWARE VARIABLES
 Zumo32U4Motors motors;
 Zumo32U4Buzzer buzzer;
 Zumo32U4ProximitySensors proxSensors;
 
 // SETUP BLUETOOTH SERIAL
-const int RX_PIN = 14;
 const int TX_PIN = 13;
+const int RX_PIN = 14;
 SoftwareSerial BluetoothSerial(RX_PIN, TX_PIN);
 
 // SPLIT A COMMAND STRING INTO 4 SUBSTRINGS (command word, argument 1-3)
@@ -26,20 +36,31 @@ void splitCommands(String command, String *cmd, String *arg0, String *arg1, Stri
     command = command.substring(command.indexOf(" ") + 1);
 }
 
-// SPLITS A COMMAND STRING AND RUNS THE CORRESPONDING ACTION
+// RUNS THE CORRESPONDING ACTION TO THE GIVEN COMMAND
 void commands(String command)
 {
-    if (command.length() == 9)
-    {
-        String cmd, arg0, arg1, arg2;
-        splitCommands(command, &cmd, &arg0, &arg1, &arg2);
 
-        if (cmd == "m")
+    String cmd, arg0, arg1, arg2;
+    splitCommands(command, &cmd, &arg0, &arg1, &arg2);
+
+    // MOVE THE ZUMO
+    if (cmd == "m")
+    {
+        if (command.length() == 9)
         {
             int leftSpeed = arg0.toInt() - 300;
             int rightSpeed = arg1.toInt() - 300;
 
             motors.setSpeeds(leftSpeed, rightSpeed);
+        }
+    }
+    // HONK A STAR WARS MELODY
+    else if (cmd == "h")
+    {
+        if (command.length() == 1)
+        {
+            buzzer.stopPlaying();
+            buzzer.playFromProgramSpace(Starwars);
         }
     }
 }
@@ -52,6 +73,7 @@ void sendSensorData(int frontLeft, int frontRight, int sideLeft, int sideRight)
     sd += String(frontRight) + " ";
     sd += String(sideLeft) + " ";
     sd += String(sideRight);
+    BluetoothSerial.flush();
     BluetoothSerial.println(sd);
 }
 
@@ -73,13 +95,14 @@ void setup()
     proxSensors.initThreeSensors();
 }
 
-// GLOBAL COMMAND VARIABLES
-const int datalength = 25;
-char cmd_chars[datalength];
-String cmd = "";
+// USED FOR A DELAY LATER IN THE LOOP
+unsigned long previousMillis = 0;
+const long interval = 1000;
 
 void loop()
 {
+    unsigned long currentMillis = millis();
+
     // ========== READ SENSORS ============================================================
     proxSensors.read();
     int frontLeft = proxSensors.countsFrontWithLeftLeds();
@@ -92,37 +115,34 @@ void loop()
     //
     // ========== BLUETOOTH IN ============================================================
 
+    const int datalength = 15;
+    char btdata[datalength] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
     // BLUETOOTH SIGNAL IS COMING IN
-    if (BluetoothSerial.available() && cmd == "")
+    if (BluetoothSerial.available() > 0)
     {
         // READ CHARS AND WRITE TO COMMAND STRING
-        BluetoothSerial.readBytesUntil(';', cmd_chars, datalength);
-        cmd = String(cmd_chars);
+        BluetoothSerial.flush();
+        BluetoothSerial.readBytesUntil(';', btdata, datalength);
+        String cmd = String(btdata);
         Serial.println(cmd);
-        BluetoothSerial.flush();
+        commands(cmd);
+        delay(100);
     }
-    else
-    {
-        BluetoothSerial.flush();
-        // IF COMMAND IS FINISHED SENDING, PRINT COMMAND AND EXECUTE OVER COMMAND HANDLER
-        if (cmd != "")
-        {
-            commands(cmd);
-            cmd = "";
-            for (int i = 0; i < sizeof(cmd_chars); i++)
-            {
-                cmd_chars[i] = 0;
-            }
-            delay(100);
-        }
-    }
+
     // ====================================================================================
     //
     //
     //
     // ========== BLUETOOTH OUT ===========================================================
 
-    // sendSensorData(frontLeft, frontRight, sideLeft, sideRight);
+    // JUST SEND THE DATA EVERY 1000ms
+    if (currentMillis - previousMillis >= interval)
+    {
+        previousMillis = currentMillis;
+        sendSensorData(frontLeft, frontRight, sideLeft, sideRight);
+        delay(100);
+    }
 
     // ====================================================================================
     //
@@ -134,10 +154,8 @@ void loop()
     // STOP AND BACKUP IF SOMETHING IN FRONT
     if (frontLeft > 5 || frontRight > 5)
     {
-        motors.setSpeeds(-50, -50);
-        delay(500);
+        motors.setSpeeds(-100, -100);
+        delay(200);
         motors.setSpeeds(0, 0);
     }
-
-    delay(50);
 }
