@@ -23,8 +23,8 @@ Zumo32U4Buzzer buzzer;
 Zumo32U4ProximitySensors proxSensors;
 
 // SETUP BLUETOOTH SERIAL
-const int RX_PIN = 14;
 const int TX_PIN = 13;
+const int RX_PIN = 14;
 SoftwareSerial BluetoothSerial(RX_PIN, TX_PIN);
 
 // SPLIT A COMMAND STRING INTO 4 SUBSTRINGS (command word, argument 1-3)
@@ -45,13 +45,14 @@ void splitCommands(String command, String *cmd, String *arg0, String *arg1, Stri
   command = command.substring(command.indexOf(" ") + 1);
 }
 
-// SPLITS A COMMAND STRING AND RUNS THE CORRESPONDING ACTION
+// RUNS THE CORRESPONDING ACTION TO THE GIVEN COMMAND
 void commands(String command)
 {
 
   String cmd, arg0, arg1, arg2;
   splitCommands(command, &cmd, &arg0, &arg1, &arg2);
 
+  // MOVE THE ZUMO
   if (cmd == "m")
   {
     if (command.length() == 9)
@@ -62,6 +63,7 @@ void commands(String command)
       motors.setSpeeds(leftSpeed, rightSpeed);
     }
   }
+  // HONK A STAR WARS MELODY
   else if (cmd == "h")
   {
     if (command.length() == 1)
@@ -102,7 +104,8 @@ void setup()
   proxSensors.initThreeSensors();
 }
 
-unsigned long previousMillis = 0; // will store last time LED was updated
+// USED FOR A DELAY LATER IN THE LOOP
+unsigned long previousMillis = 0;
 const long interval = 1000;
 
 void loop()
@@ -123,7 +126,6 @@ void loop()
 
   const int datalength = 15;
   char btdata[datalength] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  String cmd = "";
 
   // BLUETOOTH SIGNAL IS COMING IN
   if (BluetoothSerial.available() > 0)
@@ -131,7 +133,7 @@ void loop()
     // READ CHARS AND WRITE TO COMMAND STRING
     BluetoothSerial.flush();
     BluetoothSerial.readBytesUntil(';', btdata, datalength);
-    cmd = String(btdata);
+    String cmd = String(btdata);
     Serial.println(cmd);
     commands(cmd);
     delay(100);
@@ -143,6 +145,7 @@ void loop()
   //
   // ========== BLUETOOTH OUT ===========================================================
 
+  // JUST SEND THE DATA EVERY 1000ms
   if (currentMillis - previousMillis >= interval)
   {
     previousMillis = currentMillis;
