@@ -1,3 +1,4 @@
+[![wakatime](https://wakatime.com/badge/github/dermrvn-code/bobo-bluetooth.svg)](https://wakatime.com/badge/github/dermrvn-code/bobo-bluetooth)
 
 # Zumo 32U4 Bluetooth
 
