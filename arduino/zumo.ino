@@ -2,9 +2,6 @@
    == Zumo Robot ==
   [ by Leona, Jakob und Marvin ]
 */
-#include <Arduino.h>
-#include <SoftwareSerial.h>
-#include <Zumo32U4.h>
 
 const char Starwars[] PROGMEM =
     "! O3 L4 ggge-8.b16 ge-8.b16g2";
