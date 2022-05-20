@@ -6,7 +6,7 @@ Dieses Projekt integriert die Steuerung über Bluetooth. Der Code in diesem Proj
 
 Da der Pololu 32U4 ohne Bluetooth-Antenne kommt, muss diese separat angebaut werden. Details dazu gibt es unter [Aufbau und Verkabelung](#aufbau-und-verkabelung).
 
-Die App integriert die Möglichkeit die Motoren zu steuern und die Sensordaten des Zumos auszulesen.
+Die App integriert die Möglichkeit die Motoren zu steuern, die Sensordaten des Zumos auszulesen und den Buzzer eine Melodie abspielen lassen.
 
 Natürlich kann dieser Code beliebig um weitere Funktionen erweitert werden.
 
