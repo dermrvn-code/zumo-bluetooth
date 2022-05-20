@@ -199,6 +199,6 @@ Mit dieser Grundidee lässt sich dieser Code (und der der App) nun beliebig erwe
 
 ## Schlusswort
 
-Vorschläge und Verbesserungen sind gerne gesehen. Der Code ist nicht perfekt, aber tut was er soll. Wenn jemand Fehler entdeckt oder eine bessere Lösung für Dinge hat, bin ich offen dafür, diese in das Projekt zu integrieren.
+Vorschläge und Verbesserungen sind gerne gesehen. Der Code ist nicht perfekt, tut aber was er soll. Wenn jemand Fehler entdeckt oder eine bessere Lösung für Dinge hat, bin ich offen dafür, diese in das Projekt zu integrieren.
 
 Ich hoffe der Code kann gut genutzt werden oder zumindest als Inspiration für jemanden dienen.
